@@ -1,0 +1,59 @@
+/* Apply box-sizing: border-box; to all elements */
+* {
+    box-sizing: border-box;
+}
+
+body, html {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f0f0f0;
+    font-family: Arial, sans-serif;
+}
+
+#game-container {
+    width: 600px; /* Adjust if necessary to fit your design */
+    background-color: white;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.text-output {
+    height: 300px;
+    overflow-y: auto;
+    margin-bottom: 10px;
+    background-color: #e9e9e9;
+    padding: 10px;
+    /* Ensure width calculations include padding */
+}
+
+.text-output p{
+    font-size: .8em;
+}
+
+.user-input {
+    width: 100%;
+    padding: 10px;
+    /* Adjust margins as necessary, but they don't affect box-sizing */
+}
+
+.scrolling-text {
+    width: 100%; /* Match the width of the game container */
+    overflow: hidden;
+    white-space: nowrap;
+    box-sizing: border-box;
+    padding-top: 10px;
+    font-size: .75em;
+}
+
+.scrolling-text div {
+    display: inline-block;
+    animation: scroll-text 90s linear infinite;
+}
+
+@keyframes scroll-text {
+    from { transform: translateX(0); }
+    to { transform: translateX(-100%); }
+}
