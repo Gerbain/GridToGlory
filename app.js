@@ -6,12 +6,14 @@ import { Upgrade } from './upgrade.js';
 import { Race } from './race.js';
 import { Player} from './player.js';
 import { Lap } from './lap.js';
+import * as game from './game.js';
 import * as utils from './utils.js';
 let marketDrivers = [];
 let raceCalendar = [];
 let currentStep = 0;
 let gameState = 'init';
-let player = {};
+const player = new Player();
+let gameData = {};
 const playerResponses = {
     teamName: '',
     playerName: '',
@@ -23,28 +25,43 @@ const teamFocuses = [
         name: "Top 3", 
         skillRange: [90, 100], 
         speedRange: [90, 100], 
+        reliabilityRange : [60,89],
         aggressivenessRange: [80, 100],
         consistencyRange: [85, 100],
         racecraftRange: [85, 100],
-        teamworkRange: [80, 100]
+        teamworkRange: [80, 100],
+        aerodynamicsRange: [utils.randomInRange(75,85), utils.randomInRange(87,92)],
+        enginePowerRange: [utils.randomInRange(75,85), utils.randomInRange(87,92)],
+        fuelEfficiencyRange: [utils.randomInRange(75,85), utils.randomInRange(87,92)],
+        tireWearRange: [utils.randomInRange(75,85), utils.randomInRange(87,92)]
     },
     { 
         name: "Mid Field", 
         skillRange: [70, 89], 
         speedRange: [70, 89], 
+        reliabilityRange : [60,89],
         aggressivenessRange: [60, 79],
         consistencyRange: [65, 84],
         racecraftRange: [65, 84],
-        teamworkRange: [60, 79]
+        teamworkRange: [60, 79],
+        aerodynamicsRange: [utils.randomInRange(65,80), utils.randomInRange(82,87)],
+        enginePowerRange: [utils.randomInRange(65,80), utils.randomInRange(82,87)],
+        fuelEfficiencyRange: [utils.randomInRange(65,80), utils.randomInRange(82,87)],
+        tireWearRange: [utils.randomInRange(65,80), utils.randomInRange(82,87)]
     },
     { 
         name: "Back Field", 
         skillRange: [50, 69], 
         speedRange: [50, 69], 
+        reliabilityRange : [60,89],
         aggressivenessRange: [40, 59],
         consistencyRange: [45, 64],
         racecraftRange: [45, 64],
-        teamworkRange: [40, 59]
+        teamworkRange: [40, 59],
+        aerodynamicsRange: [utils.randomInRange(45,70), utils.randomInRange(73,85)],
+        enginePowerRange: [utils.randomInRange(45,70), utils.randomInRange(73,85)],
+        fuelEfficiencyRange: [utils.randomInRange(45,70), utils.randomInRange(73,85)],
+        tireWearRange: [utils.randomInRange(45,70), utils.randomInRange(73,85)]
     }
 ];
 
@@ -93,7 +110,12 @@ function generateDriver(teamFocus) {
 
 function generateCar(teamFocus) {
     const speed = utils.randomInRange(teamFocus.speedRange[0], teamFocus.speedRange[1]);
-    return new Car(`Car Model ${Math.random().toString(36).substring(7)}`, speed);
+    const reliability = utils.randomInRange(teamFocus.reliabilityRange[0], teamFocus.reliabilityRange[1]);
+    const aerodynamics = utils.randomInRange(teamFocus.aerodynamicsRange[0], teamFocus.aerodynamicsRange[1]);
+    const enginePower = utils.randomInRange(teamFocus.enginePowerRange[0], teamFocus.enginePowerRange[1]);
+    const fuelEfficiency = utils.randomInRange(teamFocus.fuelEfficiencyRange[0], teamFocus.fuelEfficiencyRange[1]);
+    const tireWear = utils.randomInRange(teamFocus.tireWearRange[0], teamFocus.tireWearRange[1]);
+    return new Car(`Car Model ${Math.random().toString(36).substring(7)}`, speed, reliability, aerodynamics, enginePower, fuelEfficiency, tireWear);
 }
 
 function generateMarketDrivers(numDrivers) {
@@ -129,7 +151,7 @@ function generateMarketDrivers(numDrivers) {
             salary: utils.randomInRange(100000, 500000), // Salary between 100,000 and 500,000
         };
 
-        const basePrice = 100000; // Starting point for driver pricing
+        const basePrice = isRookie ? 67000 : 100000; // Starting point for driver pricing
         const priceModifiers = (skill + aggressiveness + consistency + racecraft + teamwork - 250) * 1000;
         const price = basePrice + priceModifiers;
 
@@ -171,14 +193,9 @@ function updateScrollingStandings(npcTeams) {
 }
 
 function populateRaceCalendar(raceCalendar, raceDetails) {
-    // Randomize the race order
     utils.shuffleArray(raceDetails);
-
-    // Clear existing races from the calendar if resetting
     raceCalendar.races = [];
     raceCalendar.currentRaceIndex = 0;
-
-    // Add each race to the calendar
     raceDetails.forEach(race => {
         let amountOfLaps = utils.randomInRange(54,78);
         raceCalendar.addRace(new Race(race.name, race.circuit, race.weather, amountOfLaps));
@@ -186,7 +203,7 @@ function populateRaceCalendar(raceCalendar, raceDetails) {
 }
 
 function getTeamBudget(teamTier) {
-    teamTier = utils.capitalizeFirstLetter(teamTier);
+    teamTier = utils.capitalizeFirstLetter(teamTier.toLowerCase());
     const budgetRanges = {
         Top: { min: 800000, max: 1000000 },
         Mid: { min: 500000, max: 750000 },
@@ -221,44 +238,19 @@ function initializeGame() {
         const driver = marketDrivers[index];
         if (driver) {
             playerTeam.addDriver(driver);
-            // Mark the driver as selected if you plan to filter them out later
             driver.selected = true;
         }
+        
     });
+    
+    //player = new Player(playerResponses.playerName, playerTeam);
+    player.setPlayerName(playerResponses.playerName);
+    player.setTeam(playerTeam);
 
-    // Remove selected drivers from marketDrivers
+    player.recordTransaction(`Hired ${marketDrivers[playerResponses.driverChoices[0]].name}`, -marketDrivers[playerResponses.driverChoices[0]].price);
+    player.recordTransaction(`Hired ${marketDrivers[playerResponses.driverChoices[1]].name}`, -marketDrivers[playerResponses.driverChoices[1]].price);
     marketDrivers = marketDrivers.filter(driver => !driver.selected);
-
-    player = new Player(playerResponses.playerName, playerTeam);
     console.log(player);
-}
-
-function processInput(input) {
-    switch(currentStep) {
-        case 0:
-            playerResponses.teamName = input;
-            utils.displayText("What is your name?", true);
-            break;
-        case 1:
-            playerResponses.playerName = input;
-            utils.displayText("Do you want a Top, Mid, or Back team?", true);
-            break;
-        case 2:
-            playerResponses.teamPreference = input.toLowerCase();
-            generatePlayerTeam(playerResponses.teamPreference);
-            displayMarketDrivers(); // This now becomes the point where drivers are shown
-            break;
-        case 3:
-            // Process the player's driver selections based on the displayed list
-            const selections = input.split(',').map(num => parseInt(num.trim(), 10) - 1); // Adjust for zero-based index
-            const selectedDrivers = selections.filter(index => index >= 0 && index < marketDrivers.length)
-                                                .map(index => marketDrivers[index]);
-            signDriversToPlayerTeam(selectedDrivers);
-            utils.displayText("Setup complete! Your journey begins...");
-            // Transition to the next phase of your game
-            break;
-    }
-    currentStep++;
 }
 
 const questions = [
@@ -271,7 +263,7 @@ const questions = [
 function displayMarketDrivers() {
     let driverList = "Available Drivers:\n";
     marketDrivers.forEach((driver, index) => {
-        driverList += `${index + 1}: ${driver.name} - Skill: ${driver.skill}, Race: ${driver.racecraft}, Agg: ${driver.aggressiveness}, cnst: ${driver.consistency}, Tmwrk: ${driver.teamwork}\n`;
+        driverList += `${index + 1}: ${driver.name} - Skill: ${driver.skill}, Race: ${driver.racecraft}, Aggr: ${driver.aggressiveness}, Consistency: ${driver.consistency}, Teamwrk: ${driver.teamwork}\n`;
         driverList += `    Price: €${driver.price} | Contract is ${driver.contract.duration} years for €${driver.contract.salary} per year\n`;
         driverList += ` \n`;
     });
@@ -290,7 +282,13 @@ function displayNextQuestion() {
     } else {
         // All questions asked, proceed with game initialization
         initializeGame();
-        console.log(playerResponses);
+        //const boughtDrivers = response.split(',');
+        console.log(player);
+        console.log(marketDrivers);
+
+        utils.displayText("Setup complete! Your journey begins...");
+        gameState = 'atthefactory';
+        game.atTheFactory();
     }
 }
 
@@ -314,11 +312,6 @@ function handlePlayerResponse(questionIndex, response) {
     }
 }
 
-function signDriversToPlayerTeam(selectedDrivers) {
-    player.team.drivers.push(...selectedDrivers);
-}
-
-
 document.addEventListener('DOMContentLoaded', () => {
     const npcTeams = generateNPCTeams(10, 2);
     console.log(npcTeams);
@@ -330,13 +323,13 @@ document.addEventListener('DOMContentLoaded', () => {
     populateRaceCalendar(raceCalendar, utils.raceDetails);
     console.log(raceCalendar);
 
-    let currentRace = raceCalendar.getCurrentRace();
+    /*let currentRace = raceCalendar.getCurrentRace();
     console.log("Current Race:", currentRace.name, "at", currentRace.circuit);
 
     let nextRace = raceCalendar.nextRace();
     if (nextRace) {
         console.log("Next Race:", nextRace.name, "at", nextRace.circuit);
-    }
+    }*/
 
     updateScrollingStandings(npcTeams);
 
@@ -346,6 +339,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const scrollToBottom = () => {
         textOutput.scrollTop = textOutput.scrollHeight;
     }
+
+    gameData.player = player;
+    gameData.teams = npcTeams;
+    gameData.market = marketDrivers;
+    gameData.Calendar = raceCalendar;
 
     userInput.addEventListener('keypress', function(e) {
         if (e.key === 'Enter') {
@@ -358,6 +356,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     handlePlayerResponse(currentStep, playerInput);
                     currentStep++;
                     displayNextQuestion();
+                    break;
+                case 'atthefactory':
+                    game.handleAtTheFactoryOption(userInput.value, gameData);
                     break;
                 default:
                     console.log('You got off track, buddy.');

@@ -106,7 +106,7 @@ export function displayText(text, useTypewriterEffect = true) {
 
     if (useTypewriterEffect) {
         let i = 0;
-        const speed = 50; // Speed in milliseconds
+        const speed = 25; // Speed in milliseconds
 
         function typeWriter() {
             if (i < text.length) {
