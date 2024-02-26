@@ -8,6 +8,7 @@ import { Player} from './player.js';
 import { Lap } from './lap.js';
 import * as game from './game.js';
 import * as utils from './utils.js';
+
 let marketDrivers = [];
 let raceCalendar = [];
 let currentStep = 0;
@@ -16,6 +17,7 @@ const player = new Player();
 let gameData = {};
 const playerResponses = {
     teamName: '',
+    teamBudget: 0,
     playerName: '',
     teamTier: '',
     driverChoices: []
@@ -224,8 +226,8 @@ function getTeamBudget(teamTier) {
 
 
 function initializeGame() {
-    const teamBudget = getTeamBudget(playerResponses.teamTier);
-    const playerTeam = new Team(playerResponses.teamName, teamBudget);
+    //const teamBudget = getTeamBudget(playerResponses.teamTier);
+    const playerTeam = new Team(playerResponses.teamName, playerResponses.teamBudget);
     for (let i = 0; i < 2; i++) {
         const focusIndex = i % teamFocuses.length;
         const teamFocus = teamFocuses[focusIndex];
@@ -246,11 +248,9 @@ function initializeGame() {
     //player = new Player(playerResponses.playerName, playerTeam);
     player.setPlayerName(playerResponses.playerName);
     player.setTeam(playerTeam);
-
-    player.recordTransaction(`Hired ${marketDrivers[playerResponses.driverChoices[0]].name}`, -marketDrivers[playerResponses.driverChoices[0]].price);
-    player.recordTransaction(`Hired ${marketDrivers[playerResponses.driverChoices[1]].name}`, -marketDrivers[playerResponses.driverChoices[1]].price);
+    player.recordTransaction(`Hired ${marketDrivers[playerResponses.driverChoices[0]-1].name}`, -marketDrivers[playerResponses.driverChoices[0]-1].price);
+    player.recordTransaction(`Hired ${marketDrivers[playerResponses.driverChoices[1]-1].name}`, -marketDrivers[playerResponses.driverChoices[1]-1].price);
     marketDrivers = marketDrivers.filter(driver => !driver.selected);
-    console.log(player);
 }
 
 const questions = [
@@ -265,6 +265,7 @@ function displayMarketDrivers() {
     marketDrivers.forEach((driver, index) => {
         driverList += `${index + 1}: ${driver.name} - Skill: ${driver.skill}, Race: ${driver.racecraft}, Aggr: ${driver.aggressiveness}, Consistency: ${driver.consistency}, Teamwrk: ${driver.teamwork}\n`;
         driverList += `    Price: €${driver.price} | Contract is ${driver.contract.duration} years for €${driver.contract.salary} per year\n`;
+        driverList += utils.evaluateDriverInvestment(driver, playerResponses.teamBudget)+"\n";
         driverList += ` \n`;
     });
     utils.displayText(driverList, true);
@@ -303,6 +304,8 @@ function handlePlayerResponse(questionIndex, response) {
             break;
         case 2:
             playerResponses.teamTier = response;
+            const teamBudget = getTeamBudget(playerResponses.teamTier);
+            playerResponses.teamBudget = teamBudget;
             break;
         case 3:
             playerResponses.driverChoices = response.split(',').map(num => parseInt(num.trim(), 10));

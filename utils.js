@@ -132,3 +132,26 @@ export function displayText(text, useTypewriterEffect = true) {
     outputElement.scrollTop = outputElement.scrollHeight;
 }
 
+export function evaluateDriverInvestment(driver, teamBudget) {
+    const skillAverage = (driver.skill + driver.racecraft + driver.aggressiveness + driver.consistency + driver.teamwork) / 5;
+    const totalCost = driver.price + (driver.contract.salary * driver.contract.duration);
+    const costPerYear = driver.price + (driver.contract.salary);
+    const skillToCostRatio = skillAverage / totalCost;
+    const budgetImpact = totalCost / teamBudget;
+    const durationImpact = 1 - (driver.contract.duration / 5); // Assuming 5 years as the max duration impact
+
+    // Incorporating a balanced assessment of skill value to cost and budget impact
+    const investmentScore = (skillToCostRatio * durationImpact) / budgetImpact;
+
+    // Decision logic based on adjusted investment score
+    if (investmentScore > 0.00005) { // Adjust threshold values based on game economy
+        return "Good investment - High skill with acceptable cost.";
+    } else if (investmentScore > 0.000025) {
+        return "Moderate investment - Balanced skill and cost.";
+    } else {
+        return "Poor investment - Cost outweighs benefits.";
+    }
+}
+
+
+

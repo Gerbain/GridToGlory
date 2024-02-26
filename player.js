@@ -22,14 +22,14 @@ export class Player {
             amount
         };
         this.financeHistory.push(transaction);
-        this.team.updateBudget(this.team.budget + amount);
+        this.team.updateBudget(amount);
     }
 
     summarizeFinanceState(financeHistory, currentBudget) {
         const recentNetEffect = financeHistory.slice(-10).reduce((acc, {amount}) => acc + amount, 0);
-        return recentNetEffect === 0 ? "Finances are stable" :
-               recentNetEffect > 0 ? "Finances have improved" :
-               "Been spending more than earning";
+        return recentNetEffect === 0 ? "Our finances are stable." :
+               recentNetEffect > 0 ? "It looks good, our finances have improved." :
+               "It seems you've been spending more than earning.";
     }
 
     displayFinanceOverview() {
@@ -47,7 +47,7 @@ export class Player {
             utils.displayText("No recent transactions.");
         }
 
-        utils.displayText(summarizeFinanceState(this.financeHistory, this.team.budget));
+        utils.displayText(this.summarizeFinanceState(this.financeHistory, this.team.budget));
 
     }
 

@@ -27,8 +27,8 @@ export class Team {
         this.points += points;
     }
 
-    updateBudget(budget){
-        this.budget += budget;
+    updateBudget(amount){
+        this.budget += amount;
     }
 
     // Additional methods for managing team operations could be added here
