@@ -8,7 +8,37 @@ export class Race {
         this.laps = [];
     }
 
-    addParticipant(driver, car) {
+    simulateQualifying(circuit) {
+        this.participants.forEach(participant => {
+            const qualifyingLap = new Lap(0, this.weather); // Qualifying lap, lap number 0 for simplicity
+            qualifyingLap.calculateLapTime(participant.driver, participant.car, circuit);
+            participant.fastestLap = qualifyingLap.lapTime;
+        });
+
+        // Sort participants based on their fastest laps
+        this.participants.sort((a, b) => a.fastestLap - b.fastestLap);
+    }
+
+    simulateRace(circuit) {
+        for (let i = 1; i <= this.amountOfLaps; i++) {
+            const lapWeather = this.weather; // For simplicity, assume weather is constant; you can add logic to change it
+            const lap = new Lap(i, lapWeather);
+
+            this.participants.forEach(participant => {
+                lap.calculateLapTime(participant.driver, participant.car, circuit);
+                // Here, you could also add logic to simulate events and modify lap times accordingly
+                participant.totalTime += lap.lapTime; // Assuming totalTime is tracked in participant object
+            });
+
+            // Optionally, sort participants based on total time to update positions dynamically
+            this.laps.push(lap); // Record the completed lap
+        }
+
+        // Final sorting to determine race finish order
+        this.participants.sort((a, b) => a.totalTime - b.totalTime);
+    }
+
+    /*addParticipant(driver, car) {
         this.participants.push({ driver, car, totalRaceTime: 0 });
     }
 
@@ -73,5 +103,5 @@ export class Race {
         this.participants.forEach((participant, index) => {
             console.log(`${index + 1}: ${participant.driver.name}, Total Time: ${participant.totalRaceTime.toFixed(2)} seconds`);
         });
-    }
+    }*/
 }
