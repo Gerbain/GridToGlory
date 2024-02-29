@@ -6,21 +6,30 @@ export class Lap {
         this.lapTime = 0; // Placeholder for the lap time, to be calculated
     }
 
-    addEvent(event) {
-        // Add an event to the lap. Events could be overtakes, crashes, pit stops, etc.
-        this.events.push(event);
+    calculateLapTime(participant, circuit, lapNumber) {
+        const baseTime = circuit.baseLapTime;
+        const skillImpact = 100 - participant.driver.skill;
+        const driverSkillModifier = skillImpact * 0.02;
+        const carPerformance = participant.car.speed;
+        const carSpeedModifier = (100 - carPerformance) * 0.02;
+        const tireWearModifier = participant.car.tireWear * 0.05; // Example: Increase time as tire wears
+    
+        let weatherModifier;
+        switch (this.weather) {
+            case 'rainy': weatherModifier = 5; break;
+            case 'foggy': weatherModifier = 2; break;
+            case 'windy': weatherModifier = 1; break;
+            default: weatherModifier = 0;
+        }
+    
+        const variabilityFactor = (Math.random() * 1) - 0.7;
+        const fatigueModifier = lapNumber > 50 ? (lapNumber - 50) * 0.02 : 0;
+        this.lapTime = baseTime + driverSkillModifier + carSpeedModifier + tireWearModifier + weatherModifier + variabilityFactor + fatigueModifier;
+    
+        // Ensure lap time doesn't fall below a realistic minimum
+        this.lapTime = Math.max(this.lapTime, baseTime * 0.95);
+        return this.lapTime;
     }
-
-    calculateLapTime(driver, car, circuit) {
-        // Placeholder for the method to calculate lap time based on various factors
-        // This should consider driver skill, car performance, weather conditions, and circuit characteristics
-
-        const baseTime = circuit.baseLapTime; // Assuming circuit object has a base lap time property
-        const driverModifier = driver.skill * 0.05; // Example modifier based on driver skill
-        const carModifier = car.speed * 0.1; // Modifier based on car speed attribute
-        const weatherModifier = this.weather === 'rainy' ? 10 : 0; // Add time if weather is rainy
-
-        // Calculate total lap time with modifiers
-        this.lapTime = baseTime - driverModifier + carModifier + weatherModifier + (Math.random() * 5 - 2.5); // Adding some randomness
-    }
+    
+    
 }

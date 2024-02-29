@@ -31,21 +31,21 @@ export const budgetRanges = {
     "Mid Field": { min: 500000, max: 799999 },
     "Back Field": { min: 300000, max: 499999 }
 };
-export const raceDetails = [
-    { name: "Australian Grand Prix", circuit: "Albert Park Circuit", weather: "Sunny" },
-    { name: "Bahrain Grand Prix", circuit: "Bahrain International Circuit", weather: "Night Clear" },
-    { name: "Monaco Grand Prix", circuit: "Circuit de Monaco", weather: "Cloudy" },
-    { name: "Canadian Grand Prix", circuit: "Circuit Gilles Villeneuve", weather: "Rainy" },
-    { name: "British Grand Prix", circuit: "Silverstone Circuit", weather: "Overcast" },
-    { name: "Belgian Grand Prix", circuit: "Circuit de Spa-Francorchamps", weather: "Foggy" },
-    { name: "Italian Grand Prix", circuit: "Autodromo Nazionale Monza", weather: "Sunny" },
-    { name: "Japanese Grand Prix", circuit: "Suzuka Circuit", weather: "Rainy" },
-    { name: "United States Grand Prix", circuit: "Circuit of the Americas", weather: "Windy" },
-    { name: "Brazilian Grand Prix", circuit: "Autódromo José Carlos Pace", weather: "Variable" },
-    { name: "Saudi Arabian Grand Prix", circuit: "Jeddah Corniche Circuit", weather: "Night Clear" },
-    { name: "Abu Dhabi Grand Prix", circuit: "Yas Marina Circuit", weather: "Night Clear" }
-];
 
+export const raceDetails = [
+    { name: "Australian Grand Prix", circuit: "Albert Park Circuit", weather: "Sunny", baseLapTime: 90 }, // Seconds
+    { name: "Bahrain Grand Prix", circuit: "Bahrain International Circuit", weather: "Night Clear", baseLapTime: 95 },
+    { name: "Monaco Grand Prix", circuit: "Circuit de Monaco", weather: "Cloudy", baseLapTime: 75 },
+    { name: "Canadian Grand Prix", circuit: "Circuit Gilles Villeneuve", weather: "Rainy", baseLapTime: 80 },
+    { name: "British Grand Prix", circuit: "Silverstone Circuit", weather: "Overcast", baseLapTime: 87 },
+    { name: "Belgian Grand Prix", circuit: "Circuit de Spa-Francorchamps", weather: "Foggy", baseLapTime: 105 },
+    { name: "Italian Grand Prix", circuit: "Autodromo Nazionale Monza", weather: "Sunny", baseLapTime: 80 },
+    { name: "Japanese Grand Prix", circuit: "Suzuka Circuit", weather: "Rainy", baseLapTime: 98 },
+    { name: "United States Grand Prix", circuit: "Circuit of the Americas", weather: "Windy", baseLapTime: 95 },
+    { name: "Brazilian Grand Prix", circuit: "Autódromo José Carlos Pace", weather: "Variable", baseLapTime: 88 },
+    { name: "Saudi Arabian Grand Prix", circuit: "Jeddah Corniche Circuit", weather: "Night Clear", baseLapTime: 94 },
+    { name: "Abu Dhabi Grand Prix", circuit: "Yas Marina Circuit", weather: "Night Clear", baseLapTime: 105 }
+];
 
 // Function to generate a random number within a given range
 export function randomInRange(min, max) {

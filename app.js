@@ -200,7 +200,7 @@ function populateRaceCalendar(raceCalendar, raceDetails) {
     raceCalendar.currentRaceIndex = 0;
     raceDetails.forEach(race => {
         let amountOfLaps = utils.randomInRange(54,78);
-        raceCalendar.addRace(new Race(race.name, race.circuit, race.weather, amountOfLaps));
+        raceCalendar.addRace(new Race(race.name, race.circuit, race.weather, amountOfLaps, race.baseLapTime));
     });
 }
 
@@ -325,6 +325,16 @@ document.addEventListener('DOMContentLoaded', () => {
     raceCalendar = new Calendar();
     populateRaceCalendar(raceCalendar, utils.raceDetails);
     console.log(raceCalendar);
+
+    let tempRace = new Race("Race 1", raceCalendar.races[0], "sunny");
+    npcTeams.forEach(team => {
+        tempRace.participants.push({driver: team.drivers[0], car: team.cars[0]});
+        tempRace.participants.push({driver: team.drivers[1], car: team.cars[1]});
+    });
+
+    tempRace.simulateQualifying(raceCalendar.races[0]);
+    tempRace.displayQualifyingResults();
+    tempRace.simulateRace(raceCalendar.races[0]);
 
     /*let currentRace = raceCalendar.getCurrentRace();
     console.log("Current Race:", currentRace.name, "at", currentRace.circuit);

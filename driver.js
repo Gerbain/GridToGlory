@@ -24,4 +24,9 @@ export class Driver {
     displayInfo() {
         console.log(`Driver Name: ${this.name}, Skill: ${this.skill}, Contract Duration: ${this.contract.duration}, Salary: ${this.contract.salary}`);
     }
+
+    calculateFatigue(lapNumber) {
+        // Simple fatigue model: slight increase in lap times after a certain lap
+        return lapNumber > 50 ? (lapNumber - 50) * 0.1 : 0; // Example: 0.1 seconds added per lap after 50 laps
+    }
 }
